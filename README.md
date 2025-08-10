@@ -1,4 +1,4 @@
-# Propuesta de sitio web para [Nombre Cliente] - ISP
+# Propuesta de sitio web - ISP
 
 ## Secciones y características
 
@@ -42,17 +42,14 @@
 
 ## Estimación de tiempos y costos
 
-- **Tiempo estimado de desarrollo:** 11 horas (con integración de contenido y banners proporcionados por el cliente y uso de herramientas que aceleran la codificación).  
-- **Tarifa:** $15 USD por hora (tarifa especial para primer cliente).  
+- **Tiempo estimado de desarrollo:** 1 a 2 semanas.  
 - **Costo total:** **$165 USD**.
 
 ---
 
 ## Alcance y entregables
 
-- Sitio web moderno, rápido y responsivo, desarrollado con tecnologías actuales.  
+- Sitio web moderno, rápido y responsivo, desarrollado Astro.  
 - Integración completa de todas las secciones indicadas, funcionales y con diseño profesional.  
-- Soporte básico post-lanzamiento por 1 mes (corrección de errores y ajustes menores).  
-- Capacitación básica para gestión y uso del sitio (opcional, según acuerdo).
-
+- Soporte básico post-lanzamiento por 1 mes (corrección de errores y ajustes menores).
 ---
