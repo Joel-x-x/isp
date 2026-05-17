@@ -349,10 +349,10 @@ NODE_ENV=production
 PORT=3000
 
 # PostgreSQL
-DATABASE_URL=postgresql://user:password@postgres:5432/ipvt_bot
-DB_USER=ipvt_user
+DATABASE_URL=postgresql://user:password@postgres:5432/isp
+DB_USER=isp_user
 DB_PASSWORD=strong_password_here
-DB_NAME=ipvt_bot
+DB_NAME=isp
 
 # WispHub
 WISPHUB_API_URL=https://wisphub.net/api
@@ -361,7 +361,7 @@ WISPHUB_API_KEY=your_api_key_here
 # Evolution API
 EVOLUTION_API_URL=http://evolution-api:8080
 EVOLUTION_API_KEY=your_evolution_key
-EVOLUTION_INSTANCE_NAME=ipvt-bot
+EVOLUTION_INSTANCE_NAME=isp
 
 # Telegram
 TELEGRAM_BOT_TOKEN=your_bot_token
@@ -387,7 +387,7 @@ version: '3.9'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: ipvt-postgres
+    container_name: isp-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -400,7 +400,7 @@ services:
 
   evolution-api:
     image: atendai/evolution-api:latest
-    container_name: ipvt-evolution
+    container_name: isp-evolution
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -413,7 +413,7 @@ services:
 
   nestjs-app:
     build: .
-    container_name: ipvt-app
+    container_name: isp-app
     restart: unless-stopped
     depends_on:
       - postgres

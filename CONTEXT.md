@@ -1,4 +1,4 @@
-# IPVT Bot — Sistema de Notificación de Facturas Vencidas
+# ISP — Sistema de Notificación de Facturas Vencidas
 
 Sistema automatizado que consulta facturas vencidas en WispHub y envía recordatorios de pago
 vía WhatsApp, operado por un ISP para sus clientes de servicio de internet.
