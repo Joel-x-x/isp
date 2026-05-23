@@ -94,7 +94,7 @@ export class BatchService {
         return true;
       } catch (err) {
         this.logger.warn(
-          `[WA] ✗ Fallo en ${cliente.nombre} (+${cliente.telefono}) — intento ${intento + 1}/3: ${err.message}`,
+          `[WA] ✗ Fallo en ${cliente.nombre} (+${cliente.telefono}) — intento ${intento + 1}/4: ${err.message}`,
         );
 
         if (intento < 3) {

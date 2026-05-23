@@ -33,6 +33,11 @@ export default () => ({
     batchPauseMaxMs: parseInt(process.env.BATCH_PAUSE_MAX_MS ?? '300000', 10),
     cronMorning: process.env.CRON_MORNING ?? '0 9 * * 1-6',
     cronAfternoon: process.env.CRON_AFTERNOON ?? '0 15 * * 1-6',
+    cronTimezone: process.env.CRON_TIMEZONE ?? 'America/Mexico_City',
     countryCode: process.env.COUNTRY_CODE ?? '52',
   },
+
+  webhookSecret: process.env.WEBHOOK_SECRET ?? '',
+  dryRun: process.env.DRY_RUN === 'true',
+  wisphubMock: process.env.WISPHUB_MOCK === 'true',
 });

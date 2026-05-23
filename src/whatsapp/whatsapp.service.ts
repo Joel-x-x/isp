@@ -8,6 +8,7 @@ export class WhatsAppService {
   private readonly logger = new Logger(WhatsAppService.name);
   private readonly http: AxiosInstance;
   private readonly instanceName: string;
+  private readonly dryRun: boolean;
 
   constructor(private readonly config: ConfigService) {
     this.http = axios.create({
@@ -16,10 +17,18 @@ export class WhatsAppService {
       timeout: 30000,
     });
     this.instanceName = config.get<string>('evolution.instanceName') ?? 'isp';
+    this.dryRun = config.get<boolean>('dryRun') ?? false;
   }
 
   async enviarMensaje(cliente: ClienteConFacturas): Promise<void> {
     const texto = this.formatearMensaje(cliente);
+
+    if (this.dryRun) {
+      this.logger.log(
+        `[DRY RUN] Mensaje NO enviado a +${cliente.telefono}:\n${texto}\n${'─'.repeat(40)}`,
+      );
+      return;
+    }
 
     await this.http.post(`/message/sendText/${this.instanceName}`, {
       number: cliente.telefono,

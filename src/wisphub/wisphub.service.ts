@@ -9,17 +9,25 @@ export class WispHubService {
   private readonly logger = new Logger(WispHubService.name);
   private readonly http: AxiosInstance;
   private readonly countryCode: string;
+  private readonly mockMode: boolean;
 
   constructor(private readonly config: ConfigService) {
     this.http = axios.create({
       baseURL: config.get<string>('wisphub.apiUrl'),
-      headers: { Authorization: `Token ${config.get<string>('wisphub.apiKey')}` },
+      headers: { Authorization: `Api-Key ${config.get<string>('wisphub.apiKey')}` },
       timeout: 30000,
     });
     this.countryCode = config.get<string>('notifications.countryCode') ?? '52';
+    this.mockMode = config.get<boolean>('wisphubMock') ?? false;
   }
 
   async obtenerClientesConFacturasVencidas(): Promise<ClienteConFacturas[]> {
+    if (this.mockMode) {
+      const clientes = this.generarClientesMock();
+      this.logger.log(`[WISPHUB][MOCK] ${clientes.length} clientes mock generados`);
+      return clientes;
+    }
+
     const hoy = new Date().toISOString().split('T')[0];
     const facturas = await this.fetchTodasLasFacturasVencidas(hoy);
 
@@ -30,6 +38,58 @@ export class WispHubService {
     this.logger.log(`[WISPHUB] ${agrupadas.length} clientes con facturas vencidas`);
 
     return agrupadas;
+  }
+
+  private generarClientesMock(): ClienteConFacturas[] {
+    const telefono = this.normalizarTelefono('0960801963')!;
+    const nombres = [
+      'Carlos Pérez', 'María López', 'Juan García', 'Ana Martínez', 'Luis Rodríguez',
+      'Sofia Torres', 'Diego Flores', 'Valentina Cruz', 'Andrés Morales', 'Camila Jiménez',
+      'Pablo Romero', 'Isabella Vargas', 'Mateo Herrera', 'Gabriela Mendoza', 'Ricardo Castillo',
+      'Fernanda Ramos', 'Sebastián Guerrero', 'Daniela Ortiz', 'Alejandro Reyes', 'Natalia Soto',
+      'Esteban Díaz', 'Luciana Vega', 'Tomás Mora', 'Verónica Aguilar', 'Cristian Ríos',
+    ];
+    const montos = [22, 28, 35, 45, 50, 18, 30, 40, 55, 25];
+    const diasAtraso = [5, 10, 15, 20, 30, 45, 7, 12, 25, 60];
+
+    return nombres.map((nombre, i) => {
+      const hoy = new Date();
+      const venc1 = new Date(hoy);
+      venc1.setDate(hoy.getDate() - diasAtraso[i % diasAtraso.length]);
+      const monto1 = montos[i % montos.length];
+
+      const facturas: ClienteConFacturas['facturas'] = [
+        {
+          id: 1000 + i,
+          fechaVencimiento: venc1.toISOString().split('T')[0],
+          total: monto1,
+          saldo: monto1,
+        },
+      ];
+
+      // Algunos clientes tienen 2 facturas vencidas
+      if (i % 3 === 0) {
+        const venc2 = new Date(hoy);
+        venc2.setDate(hoy.getDate() - diasAtraso[i % diasAtraso.length] - 30);
+        const monto2 = montos[(i + 1) % montos.length];
+        facturas.push({
+          id: 2000 + i,
+          fechaVencimiento: venc2.toISOString().split('T')[0],
+          total: monto2,
+          saldo: monto2,
+        });
+      }
+
+      const totalDeuda = parseFloat(facturas.reduce((s, f) => s + f.saldo, 0).toFixed(2));
+
+      return {
+        clienteId: `cliente${i + 1}@mock-isp`,
+        nombre,
+        telefono,
+        facturas,
+        totalDeuda,
+      };
+    });
   }
 
   private async fetchTodasLasFacturasVencidas(fechaHoy: string): Promise<FacturaDto[]> {
@@ -52,6 +112,7 @@ export class WispHubService {
     const response = await this.http.get<FacturasPageDto>('/facturas/', {
       params: {
         estado: 1,
+        fecha_vencimiento__range_0: '2000-01-01',
         fecha_vencimiento__range_1: fechaHoy,
         limit,
         offset,
@@ -116,11 +177,14 @@ export class WispHubService {
 
     if (soloDigitos.length < 8) return null;
 
-    // Ya tiene código de país
-    if (soloDigitos.startsWith(this.countryCode) && soloDigitos.length >= 10) {
+    // Ya tiene código de país: debe tener más dígitos que solo el código
+    const minLongitudConCodigo = this.countryCode.length + 8;
+    if (soloDigitos.startsWith(this.countryCode) && soloDigitos.length >= minLongitudConCodigo) {
       return soloDigitos;
     }
 
-    return `${this.countryCode}${soloDigitos}`;
+    //Strip leading 0 (formato local: 0960801963 → 960801963 → 593960801963)
+    const sinCero = soloDigitos.startsWith('0') ? soloDigitos.slice(1) : soloDigitos;
+    return `${this.countryCode}${sinCero}`;
   }
 }

@@ -19,31 +19,31 @@ export class NotificationCron {
 
   private registrarCronMorning(): void {
     const expresion = this.config.get<string>('notifications.cronMorning') ?? '0 9 * * 1-6';
+    const timezone = this.config.get<string>('notifications.cronTimezone') ?? 'America/Mexico_City';
 
     const job = new CronJob(expresion, () => {
       this.logger.log('[CRON] Disparando ciclo MORNING');
       this.notifications.ejecutarCiclo('MORNING').catch((err) => {
         this.logger.error(`[CRON] Error no capturado en ciclo MORNING: ${err.message}`);
       });
-    });
+    }, null, true, timezone);
 
     this.schedulerRegistry.addCronJob('notificacion-morning', job);
-    job.start();
-    this.logger.log(`[CRON] Job MORNING registrado: ${expresion}`);
+    this.logger.log(`[CRON] Job MORNING registrado: ${expresion} (${timezone})`);
   }
 
   private registrarCronAfternoon(): void {
     const expresion = this.config.get<string>('notifications.cronAfternoon') ?? '0 15 * * 1-6';
+    const timezone = this.config.get<string>('notifications.cronTimezone') ?? 'America/Mexico_City';
 
     const job = new CronJob(expresion, () => {
       this.logger.log('[CRON] Disparando ciclo AFTERNOON');
       this.notifications.ejecutarCiclo('AFTERNOON').catch((err) => {
         this.logger.error(`[CRON] Error no capturado en ciclo AFTERNOON: ${err.message}`);
       });
-    });
+    }, null, true, timezone);
 
     this.schedulerRegistry.addCronJob('notificacion-afternoon', job);
-    job.start();
-    this.logger.log(`[CRON] Job AFTERNOON registrado: ${expresion}`);
+    this.logger.log(`[CRON] Job AFTERNOON registrado: ${expresion} (${timezone})`);
   }
 }
